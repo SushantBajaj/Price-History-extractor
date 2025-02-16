@@ -49,7 +49,7 @@ async def extract_chart_data(url):
 )
         page = await context.new_page()
         await page.goto(url)
-        # await page.wait_for_function("window.ChartConfigs?.data?.datasets?.[1]?.data")
+        await page.wait_for_function("window.ChartConfigs?.data?.datasets?.[1]?.data")
         variable_value = await page.evaluate("window.ChartConfigs.data.datasets[1].data")
         
         await browser.close()
