@@ -6,8 +6,20 @@ app = FastAPI()
 
 async def get_product_page(url):
     async with async_playwright() as p:
-        browser = await p.chromium.launch(headless=True)
-        page = await browser.new_page()
+        browser = await p.chromium.launch(headless=True,args=[
+            '--no-sandbox',
+            '--disable-setuid-sandbox',
+            '--disable-dev-shm-usage',
+            '--disable-accelerated-2d-canvas',
+            '--no-zygote',
+            '--disable-gpu',
+            '--mute-audio'
+        ])
+        context = await browser.new_context(
+    user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
+)
+        page = await context.new_page()
+
         await page.goto("https://pricehistory.app")
         await page.fill("#search", url)
         await page.press("#search", "Enter")
@@ -23,11 +35,21 @@ async def get_product_page(url):
 
 async def extract_chart_data(url):
     async with async_playwright() as p:
-        browser = await p.chromium.launch(headless=True)
-        page = await browser.new_page()
-        
+        browser = await p.chromium.launch(headless=True,args=[
+            '--no-sandbox',
+            '--disable-setuid-sandbox',
+            '--disable-dev-shm-usage',
+            '--disable-accelerated-2d-canvas',
+            '--no-zygote',
+            '--disable-gpu',
+            '--mute-audio'
+        ])
+        context = await browser.new_context(
+    user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
+)
+        page = await context.new_page()
         await page.goto(url)
-        await page.wait_for_function("window.ChartConfigs?.data?.datasets?.[1]?.data")
+        # await page.wait_for_function("window.ChartConfigs?.data?.datasets?.[1]?.data")
         variable_value = await page.evaluate("window.ChartConfigs.data.datasets[1].data")
         
         await browser.close()
